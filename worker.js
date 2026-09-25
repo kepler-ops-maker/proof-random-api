@@ -2,7 +2,7 @@ const chain='52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971';
 const relay='https://drand.cloudflare.com/'+chain+'/public/latest';
 const hash=async a=>new Uint8Array(await crypto.subtle.digest('SHA-256',a));
 const hex=a=>[...a].map(x=>x.toString(16).padStart(2,'0')).join('');
-export default{async fetch(req){let u=new URL(req.url),n=u.searchParams.get('nonce'),m=Number(u.searchParams.get('max')||'6');
+async function handle(req){let u=new URL(req.url),n=u.searchParams.get('nonce'),m=Number(u.searchParams.get('max')||'6');
 if(u.pathname==='/')return new Response('Proof Random API free demo. GET /v1/random?max=6&nonce=unique. x402 not live.');
 if(u.pathname==='/llms.txt')return new Response('Proof Random API free demo. GET /v1/random?max=6&nonce=unique. Verify BLS separately; x402 not live.');
 if(u.pathname!='/v1/random')return new Response('Not found',{status:404});
@@ -10,4 +10,18 @@ if(!n||n.length>128||!/^[1-9]\d{0,5}$/.test(String(m))||m>65536)return new Respo
 try{let resp=await fetch(relay);if(!resp.ok)throw 0;let b=await resp.json();if(!Number.isSafeInteger(b.round)||!/^([a-f0-9]{2})+$/i.test(b.signature)||!/^[a-f0-9]{64}$/i.test(b.randomness))throw 0;
 let signature=Uint8Array.from(b.signature.match(/../g).map(x=>parseInt(x,16)));if(hex(await hash(signature))!==b.randomness.toLowerCase())throw 0;
 let limit=Math.floor(4294967296/m)*m,k=0,v=limit;while(v>=limit&&k<100){let data=new TextEncoder().encode(chain+':'+b.round+':'+b.randomness+':'+n+':'+k++);v=new DataView((await hash(data)).buffer).getUint32(0)}if(v>=limit)throw 0;
-return Response.json({value:v%m,range:[0,m],nonce:n,chainHash:chain,round:b.round,randomness:b.randomness,signature:b.signature,signatureDigestMatches:true,blsVerified:false,counter:k-1,algorithm:'SHA-256(chainHash:round:randomness:nonce:counter), uint32be, rejection sample',x402:false})}catch{return new Response('Beacon unavailable or invalid',{status:503})}}};
+return Response.json({value:v%m,range:[0,m],nonce:n,chainHash:chain,round:b.round,randomness:b.randomness,signature:b.signature,signatureDigestMatches:true,blsVerified:false,counter:k-1,algorithm:'SHA-256(chainHash:round:randomness:nonce:counter), uint32be, rejection sample',x402:false})}catch{return new Response('Beacon unavailable or invalid',{status:503})}}
+export default {async fetch(req,env){
+  const url=new URL(req.url);
+  const response=await handle(req);
+  try {
+    // Aggregate dimensions only. Never record nonce, IP, full referrer, or User-Agent.
+    const ref=req.headers.get('referer');
+    let host='direct';
+    if(ref){try{host=new URL(ref).hostname.slice(0,80)||'direct'}catch{host='invalid-referrer'}}
+    const src=url.searchParams.get('src')||'none';
+    const campaign=/^(devto|github|awesome|brewpage|direct)$/.test(src)?src:'other';
+    env?.PROOF_ANALYTICS?.writeDataPoint({blobs:[url.pathname,host,campaign,String(response.status)],doubles:[1],indexes:['proof-random']});
+  } catch {} // Observability must never break the API.
+  return response;
+}};
