@@ -3,7 +3,7 @@
 A free prototype relaying the [drand quicknet](https://docs.drand.love/developer/) beacon to agent clients. This is not a VRF implementation or a paid x402 product.
 
 - Live API: https://proof-random-api.pn-26f.workers.dev/v1/random?nonce=your-unique-id&max=6
-- [Agent skill](SKILL.md), [verified JavaScript client](verified-client.mjs), and [Worker source](worker.js)
+- [Agent skill](SKILL.md), [verified JavaScript client](verified-client.mjs), [agent task-picker example](agent-pick.mjs), and [Worker source](worker.js)
 - Discovery: [agent text](https://proof-random-api.pn-26f.workers.dev/llms.txt), [OpenAPI 3.1](https://proof-random-api.pn-26f.workers.dev/openapi.json), and [sitemap](https://proof-random-api.pn-26f.workers.dev/sitemap.xml)
 - Mobile demo page (temporary, 30-day expiry): https://brewpage.app/public/0M5fGsya2L
 - Method: `GET`. `nonce` required, 1-128 characters, reflected verbatim; `max` optional integer 1..65536, default 6.
