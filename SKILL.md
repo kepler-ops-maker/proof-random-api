@@ -1,6 +1,7 @@
 ---
 name: proof-random-free-beacon
 summary: Fetch a drand quicknet beacon and independently verify it before sampling an integer. Free prototype, not a VRF or x402 service.
+description: Fetch a drand quicknet beacon and verify it client-side before sampling an integer. Free relay, not a VRF.
 ---
 # Proof Random free beacon for agents
 
