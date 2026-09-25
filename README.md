@@ -4,7 +4,7 @@ A free prototype relaying the [drand quicknet](https://docs.drand.love/developer
 
 - Live API: https://proof-random-api.pn-26f.workers.dev/v1/random?nonce=your-unique-id&max=6
 - [Agent skill](SKILL.md), [verified JavaScript client](verified-client.mjs), and [Worker source](worker.js)
-- [Agent discovery text](https://proof-random-api.pn-26f.workers.dev/llms.txt)
+- Discovery: [agent text](https://proof-random-api.pn-26f.workers.dev/llms.txt), [OpenAPI 3.1](https://proof-random-api.pn-26f.workers.dev/openapi.json), and [sitemap](https://proof-random-api.pn-26f.workers.dev/sitemap.xml)
 - Mobile demo page (temporary, 30-day expiry): https://brewpage.app/public/0M5fGsya2L
 - Method: `GET`. `nonce` required, 1-128 characters, reflected verbatim; `max` optional integer 1..65536, default 6.
 - Response includes `value` in `[0,max)`, `range`, `round`, `randomness`, `signature`, `nonce`, `signatureDigestMatches:true`, `blsVerified:false`, `x402:false`.
@@ -24,4 +24,4 @@ The Worker writes aggregate request metadata to Cloudflare Analytics Engine: URL
 
 No user deposits, stakes, sponsor prizes, x402 charges or real-money coin flips are part of this demo. Do not advertise Bazaar indexing before a settled payment and a live search result. See [Bazaar requirements](https://docs.cdp.coinbase.com/x402/validate-endpoint).
 
-Status 2026-09-25: free prototype deployed. BLS verification: client-side only. x402: not enabled. Bazaar: not indexed. Sales: none.
+Status 2026-09-26: free prototype deployed, with a landing page and discovery routes. BLS verification: client-side only. x402: not enabled. Bazaar: not indexed. Sales: none.
