@@ -17,6 +17,11 @@ node verified-client.mjs
 
 **Trust boundary:** The Worker checks only `SHA-256(signature) == randomness` and derives an integer with rejection sampling. It does **not** authenticate drand's BLS signature. The [reference client](verified-client.mjs) pins quicknet chain hash and public key, fetches and verifies the same round with official `drand-client`, compares the response's signature/randomness, then derives its own nonce-bound integer. For a security-sensitive use, verify independently, review code, and do not rely on the server's `value` alone. A latest-round beacon can already be known before the requester chooses to call. Fairness needs a fixed nonce and agreed *future* round before publication, which this API does not enforce. Do not use it for stakes, prizes, audited draws or adversarially fair decisions.
 
+
+## Usage signals
+
+The Worker writes aggregate request metadata to Cloudflare Analytics Engine: URL path, referrer hostname (or `direct`), HTTP status, and a whitelisted `src` campaign (`devto`, `github`, `awesome`, `brewpage`, `direct`, or `other`). It does not send nonce, IP address, full referrer URL, or user-agent to that custom dataset. Cloudflare's normal Worker metrics remain separate. Add `&src=github` or another listed source to a test URL if you want to measure a campaign. These counts include our own tests; they are not proof that outside agents have used the API.
+
 No user deposits, stakes, sponsor prizes, x402 charges or real-money coin flips are part of this demo. Do not advertise Bazaar indexing before a settled payment and a live search result. See [Bazaar requirements](https://docs.cdp.coinbase.com/x402/validate-endpoint).
 
 Status 2026-09-25: free prototype deployed. BLS verification: client-side only. x402: not enabled. Bazaar: not indexed. Sales: none.
