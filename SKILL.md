@@ -2,6 +2,10 @@
 name: proof-random-free-beacon
 summary: Fetch a drand quicknet beacon and independently verify it before sampling an integer. Free prototype, not a VRF or x402 service.
 description: Fetch a drand quicknet beacon and verify it client-side before sampling an integer. Free relay, not a VRF.
+permissions:
+  - network: "Fetches the free Proof Random API beacon and the matching drand quicknet round over HTTPS for independent verification"
+  - exec: "Runs the local Node.js reference client only when the operator chooses to run the example"
+  - package_bootstrap: "The documented example requires installing the official drand-client npm dependency before running it; review the package and its install-time scripts first"
 ---
 # Proof Random free beacon for agents
 
@@ -11,5 +15,9 @@ Use this only when the caller needs a public, verifiable randomness sample that 
 2. Do not trust `randomness` or the server-derived `value` merely because the Worker returned it. Use [verified-client.mjs](https://github.com/kepler-ops-maker/proof-random-api/blob/main/verified-client.mjs) and install the official [drand-client](https://github.com/drand/drand-client) package: `npm install drand-client`. Run `node verified-client.mjs` or import `getVerifiedBeacon` and `sampleInteger`. The client checks the BLS signature and the signature/randomness for the same round independently before setting `clientVerified:true`. If it errors, fail closed.
 3. For an integer from 0 through N-1, use `sampleInteger(await getVerifiedBeacon({nonce}), N)`, N = 1..65536. Do not use a modulo operation without rejection sampling.
 4. A latest-round beacon may be known before an agent chooses to call. For an adversarial fairness claim, parties must agree on a future round, a nonce and rules before that round publishes. This API does not implement that agreement, and its current endpoint is unsuitable for stakes, prizes or security-critical draws.
+
+## Safety boundaries
+
+Do not use the latest-round endpoint for prizes, payments, security-critical decisions, or any draw where someone can choose a favorable time to call. Do not accept the Worker response as BLS-verified or trust its returned integer without client-side verification and recomputation. Network calls in the example are limited to the Proof Random API and the pinned drand quicknet endpoint; the client should not read credentials or send private data. Installing drand-client and running the local example are optional operator actions, not steps to execute without review.
 
 Free API status: no charge and no x402 gate, no Bazaar index, no sales. Do not say this is a VRF or that the Worker verifies BLS. API status and examples: https://github.com/kepler-ops-maker/proof-random-api. Temporary demo page: https://brewpage.app/public/0M5fGsya2L. drand quicknet details: https://docs.drand.love/developer/.
